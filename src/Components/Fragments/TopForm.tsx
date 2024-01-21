@@ -9,6 +9,8 @@ const TopForm = () => {
         <table className="w-80">
           <tbody>
             {ingredient.map((item, index) => {
+              if (item.name === undefined) return null;
+
               return (
                 <tr key={index}>
                   <td className="text-center">{index + 1}</td>

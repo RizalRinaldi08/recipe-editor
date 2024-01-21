@@ -6,7 +6,7 @@ import { useIngredient } from "../../Context/IngredientContext";
 // type ingredient = { name: string; measure: string };
 const BottomForm = () => {
   const [keyword, setKeyword] = useState("");
-  const [searchResult, setSearchResult] = useState<any | null>(null);
+  // const [searchResult, setSearchResult] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   // const [ingredient, setIngredient] = useState<ingredient[]>([]);
   const { ingredient, updateIngredient } = useIngredient();
@@ -16,8 +16,8 @@ const BottomForm = () => {
   };
 
   useEffect(() => {
-    console.log("searchResult", searchResult);
-  }, [searchResult]);
+    console.log("ingredient", ingredient);
+  }, [ingredient]);
 
   const handleSearch = () => {
     if (keyword) {
@@ -29,15 +29,31 @@ const BottomForm = () => {
             //   console.log(item);
             // });
             if (res[0]) {
-              const x = Object.entries(res[0]).map(([key, value]) => { 
-                if (key === "strIngredient1") {
-                  return { name: value, measure: res[0]["strMeasure1"] } as ingredient;
-                }
-              });
+              let i = 0;
+              const x = Object.entries(res[0])
+                .map(([key, value]) => {
+                  // console.log(i);
+                  // console.log(key);
+                  if (key.startsWith("strIngredient") && value != null) {
+                    i++;
+                    if (res[0]["strMeasure" + i.toString()] == null) {
+                      return { name: value, measure: "Certainly" } as ingredient;
+                    }
+                    return { name: value, measure: res[0]["strMeasure" + i.toString()] } as ingredient;
+                  } else {
+                    return;
+                  }
+
+                  // if (key === "strIngredient" + i.toString() && value != null) {
+                  //   return { name: value, measure: res[0]["strMeasure" + i.toString()] } as ingredient;
+                  // } else {
+                  //   return;
+                  // }
+                })
+                .filter((x) => x !== undefined);
               updateIngredient(x as ingredient[]);
               console.log("inis", x);
             }
-
           } else {
             updateIngredient([]);
             console.log("null result");
@@ -48,8 +64,19 @@ const BottomForm = () => {
     }
   };
 
-  const changeIngredient = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(e.target.value);
+  const changeIngredient = (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log("input change", e.target.value);
+    console.log("ex", ingredient[index]);
+
+    // updateIngredient((prev) => {
+    //   return prev.map((item) => {
+    //     if (item.name === e.target.value) {
+    //       return { ...item, measure: e.target.value };
+    //     } else {
+    //       return item;
+    //     }
+    //   });
+    // });
   };
 
   useEffect(() => {
@@ -72,7 +99,7 @@ const BottomForm = () => {
         {ingredient.map((item, index) => {
           // console.log("item", index);
 
-          return <Item changeIngredient={changeIngredient} ingredient={item} key={index} />;
+          return <Item changeIngredient={changeIngredient(index)} ingredient={item} key={index} />;
         })}
       </div>
     </div>
