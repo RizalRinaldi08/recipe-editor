@@ -3,6 +3,8 @@ import Item from "../Elements/Item";
 import { getCocktail } from "../../service/cocktail.service";
 import { useIngredient } from "../../Context/IngredientContext";
 
+export type ingredient = { name: string; measure: string };
+
 // type ingredient = { name: string; measure: string };
 const BottomForm = () => {
   const [keyword, setKeyword] = useState("");
@@ -25,15 +27,14 @@ const BottomForm = () => {
       getCocktail(keyword, (status, res) => {
         if (status) {
           if (res != null) {
-            // const data = res[0].map((item: any) => {
-            //   console.log(item);
-            // });
-            if (res[0]) {
+            if (Array.isArray(res) && res[0]) {
+              console.log("d", res[0].strDrink);
+              
+              setKeyword(res[0].strDrink);
+
               let i = 0;
               const x = Object.entries(res[0])
                 .map(([key, value]) => {
-                  // console.log(i);
-                  // console.log(key);
                   if (key.startsWith("strIngredient") && value != null) {
                     i++;
                     if (res[0]["strMeasure" + i.toString()] == null) {
@@ -43,12 +44,6 @@ const BottomForm = () => {
                   } else {
                     return;
                   }
-
-                  // if (key === "strIngredient" + i.toString() && value != null) {
-                  //   return { name: value, measure: res[0]["strMeasure" + i.toString()] } as ingredient;
-                  // } else {
-                  //   return;
-                  // }
                 })
                 .filter((x) => x !== undefined);
               updateIngredient(x as ingredient[]);
@@ -65,17 +60,35 @@ const BottomForm = () => {
   };
 
   const changeIngredient = (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log("input change", e.target.value);
-    console.log("ex", ingredient[index]);
+    // console.log("input change", e.target.value);
+    // console.log("ex", ingredient[index]);
+    const x = ingredient;
+    const newIngredient = [...x];
+    newIngredient[index] = { ...newIngredient[index], name: e.target.value };
+    updateIngredient(newIngredient);
 
     // updateIngredient((prev) => {
-    //   return prev.map((item) => {
-    //     if (item.name === e.target.value) {
-    //       return { ...item, measure: e.target.value };
-    //     } else {
-    //       return item;
-    //     }
-    //   });
+    //   // const newIngredient = [...prev];
+    //   // newIngredient[index] = { ...newIngredient[index], name: e.target.value };
+    //   // return newIngredient;
+    //   return {
+    //     ...prev,
+    //     [index]: { ...prev[index], name: e.target.value },
+    //   };
+    // });
+  };
+
+  const changeMeasure = (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    // console.log("input change", e.target.value);
+    // console.log("ex", ingredient[index]);
+    const x = ingredient;
+    const newIngredient = [...x];
+    newIngredient[index] = { ...newIngredient[index], measure: e.target.value };
+    updateIngredient(newIngredient);
+    // updateIngredient((prev) => {
+    //   const newIngredient = [...(prev || [])];
+    //   newIngredient[index] = { ...newIngredient[index], measure: e.target.value };
+    //   return newIngredient;
     // });
   };
 
@@ -99,7 +112,7 @@ const BottomForm = () => {
         {ingredient.map((item, index) => {
           // console.log("item", index);
 
-          return <Item changeIngredient={changeIngredient(index)} ingredient={item} key={index} />;
+          return <Item changeMeasureIngredient={changeMeasure(index)} changeNameIngredient={changeIngredient(index)} ingredient={item} key={index} />;
         })}
       </div>
     </div>

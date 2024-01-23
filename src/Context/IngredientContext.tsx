@@ -2,7 +2,7 @@ import { createContext, useContext, useState } from "react";
 
 type ContextIngredient = {
   ingredient: ingredient[];
-  updateIngredient: (newData: ingredient[]) => void;
+  updateIngredient: (prev: ingredient[]) => void;
 };
 
 const IngredientContext = createContext<ContextIngredient>({
@@ -11,28 +11,13 @@ const IngredientContext = createContext<ContextIngredient>({
 });
 
 const IngredientProvider = ({ children }: { children: children }) => {
-  const [ingredient, setIngredient] = useState<ingredient[]>([
-    {
-      name: "Kopu",
-      measure: "2",
-    },
-    {
-      name: "Kop1",
-      measure: "2",
-    },
-    {
-      name: "Kopi",
-      measure: "3",
-    },
-  ]);
+  const [ingredient, setIngredient] = useState<ingredient[]>([]);
 
   const updateIngredient = (newData: ingredient[]) => {
-      setIngredient( newData);
-  }
+    setIngredient(newData);
+  };
 
-
-
-  return <IngredientContext.Provider value={{ ingredient: ingredient, updateIngredient  }}>{children}</IngredientContext.Provider>;
+  return <IngredientContext.Provider value={{ ingredient: ingredient, updateIngredient }}>{children}</IngredientContext.Provider>;
 };
 
 export const useIngredient = () => {
