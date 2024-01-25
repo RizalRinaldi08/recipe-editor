@@ -3,14 +3,11 @@ import Item from "../Elements/Item";
 import { getCocktail } from "../../service/cocktail.service";
 import { useIngredient } from "../../Context/IngredientContext";
 
-export type ingredient = { name: string; measure: string };
+export type ingredient = { name: string; measure: number };
 
-// type ingredient = { name: string; measure: string };
 const BottomForm = () => {
   const [keyword, setKeyword] = useState("");
-  // const [searchResult, setSearchResult] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  // const [ingredient, setIngredient] = useState<ingredient[]>([]);
   const { ingredient, updateIngredient } = useIngredient();
 
   const handleOnchange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -37,10 +34,48 @@ const BottomForm = () => {
                 .map(([key, value]) => {
                   if (key.startsWith("strIngredient") && value != null) {
                     i++;
+
                     if (res[0]["strMeasure" + i.toString()] == null) {
-                      return { name: value, measure: "Certainly" } as ingredient;
+                      return { name: value, measure: 0 } as ingredient;
                     }
-                    return { name: value, measure: res[0]["strMeasure" + i.toString()] } as ingredient;
+                    
+                    let result = 0;
+                    const item = res[0]["strMeasure" + i.toString()];
+                    if (item.includes("oz")) {
+                      console.log("ini oz ");
+                      const oz = item.split("oz")[0];
+                      if (Number.isNaN(Number(oz))) {
+                        const newOz = oz.split("/");
+                        result = Number(newOz[0]) / Number(newOz[1]);
+                      } else {
+                        result = Number(oz);
+                      }
+                    } else if (item.includes("Juice of")) {
+                      const juice = item.split("Juice of ")[1];
+
+                      if (Number.isNaN(Number(juice))) {
+                        const newOz = juice.split("/");
+                        result = Number(newOz[0]) / Number(newOz[1]);
+                        console.log("newOz", newOz[0], newOz[1]);
+                      } else {
+                        result = Number(juice);
+                        console.log("juice", juice.split("/")[0]);
+                      }
+                      // console.log("resultj");
+                    } else if (item.includes("tsp")) {
+                      console.log("ini tsp ");
+                      const tsp = item.split("tsp")[0];
+                      if (Number.isNaN(Number(tsp))) {
+                        const newOz = tsp.split("/");
+                        result = Number(newOz[0]) / Number(newOz[1]);
+                      } else {
+                        result = Number(tsp);
+                      }
+                    } else {
+                      0;
+                    }
+
+                    return { name: value, measure: result } as ingredient;
                   } else {
                     return;
                   }
@@ -60,36 +95,17 @@ const BottomForm = () => {
   };
 
   const changeIngredient = (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    // console.log("input change", e.target.value);
-    // console.log("ex", ingredient[index]);
     const x = ingredient;
     const newIngredient = [...x];
     newIngredient[index] = { ...newIngredient[index], name: e.target.value };
     updateIngredient(newIngredient);
-
-    // updateIngredient((prev) => {
-    //   // const newIngredient = [...prev];
-    //   // newIngredient[index] = { ...newIngredient[index], name: e.target.value };
-    //   // return newIngredient;
-    //   return {
-    //     ...prev,
-    //     [index]: { ...prev[index], name: e.target.value },
-    //   };
-    // });
   };
 
   const changeMeasure = (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    // console.log("input change", e.target.value);
-    // console.log("ex", ingredient[index]);
     const x = ingredient;
     const newIngredient = [...x];
-    newIngredient[index] = { ...newIngredient[index], measure: e.target.value };
+    newIngredient[index] = { ...newIngredient[index], measure: Number(e.target.value) || 0 };
     updateIngredient(newIngredient);
-    // updateIngredient((prev) => {
-    //   const newIngredient = [...(prev || [])];
-    //   newIngredient[index] = { ...newIngredient[index], measure: e.target.value };
-    //   return newIngredient;
-    // });
   };
 
   useEffect(() => {
