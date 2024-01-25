@@ -1,5 +1,5 @@
 import IngredientProvider from "./Context/IngredientContext";
-import HomePage from "./Pages/Homepage";
+import HomePage from "./Pages/home";
 
 function App() {
   return (
